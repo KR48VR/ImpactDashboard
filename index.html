@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Impact Briefing — C-Suite v3.1</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg:#0A0E27; --bg-alt:#121732; --bg-card:#161B3D;
+    --text-hi:#F5F5F7; --text-mid:#B8BCC8; --text-low:#6B7080;
+    --accent:#FF6B35; --same:#9B8CFF; --diff:#4ECDC4; --emerg:#FFD23F; --decide:#E63946;
+    --divider:#2A2F4F;
+    --max:1280px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text-hi);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .container{max-width:var(--max);margin:0 auto;padding:0 32px}
+
+  nav{position:sticky;top:0;z-index:50;background:rgba(10,14,39,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--divider)}
+  nav .container{display:flex;align-items:center;justify-content:space-between;height:62px}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:13px}
+  .brand-dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}
+  .brand-version{color:var(--text-low);margin-left:6px;letter-spacing:.06em}
+  .nav-links{display:flex;gap:20px;font-size:12.5px;color:var(--text-mid);flex-wrap:wrap}
+  .nav-links a{text-decoration:none;transition:color .15s}
+  .nav-links a:hover{color:var(--text-hi)}
+
+  .hero{position:relative;padding:80px 0 60px;overflow:hidden}
+  .hero::before,.hero::after{content:'';position:absolute;border-radius:50%;pointer-events:none}
+  .hero::before{width:520px;height:520px;right:-120px;top:-120px;background:radial-gradient(circle,rgba(255,107,53,.35),transparent 65%)}
+  .hero::after{width:360px;height:360px;right:-40px;top:40px;background:radial-gradient(circle,rgba(255,107,53,.25),transparent 70%)}
+  .eyebrow{display:inline-block;color:var(--accent);font-weight:700;letter-spacing:.18em;text-transform:uppercase;font-size:12px;margin-bottom:18px}
+  h1{font-size:64px;font-weight:900;letter-spacing:-.02em;line-height:1.02;max-width:900px;margin-bottom:24px}
+  .hero p.lede{font-size:19px;color:var(--text-mid);max-width:760px}
+  .hero-meta{margin-top:34px;color:var(--text-low);font-size:13px}
+
+  section{padding:64px 0;border-top:1px solid var(--divider)}
+  section h2{font-size:34px;font-weight:900;letter-spacing:-.01em;margin-bottom:12px}
+  section .sub{color:var(--text-mid);max-width:820px;margin-bottom:32px;font-size:16px}
+
+  /* Headline stats */
+  .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+  .stat{background:var(--bg-alt);border:1px solid var(--divider);border-radius:10px;padding:22px}
+  .stat .num{font-size:44px;font-weight:900;line-height:1;letter-spacing:-.02em;margin-bottom:8px}
+  .stat .label{font-weight:700;color:var(--text-hi);margin-bottom:6px;font-size:13px}
+  .stat .body{color:var(--text-mid);font-size:13px}
+  .stat .src{margin-top:14px;color:var(--text-low);font-size:11px;font-style:italic}
+  .stat.n1 .num{color:var(--accent)} .stat.n2 .num{color:var(--diff)} .stat.n3 .num{color:var(--same)} .stat.n4 .num{color:var(--decide)}
+  .caveat{color:var(--text-low);font-size:13px;font-style:italic;border-left:3px solid var(--decide);padding:8px 14px;background:var(--bg-alt);border-radius:4px;margin-top:8px}
+
+  /* Chart sections - new */
+  .chart-section{display:grid;grid-template-columns:2fr 1fr;gap:24px;align-items:start}
+  .chart-card{background:var(--bg-alt);border:1px solid var(--divider);border-radius:10px;padding:24px;position:relative}
+  .chart-card canvas{max-height:440px;width:100%!important}
+  .chart-card.small canvas{max-height:360px}
+  .chart-title{font-size:11px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:14px}
+  .commentary{background:var(--bg-alt);border:1px solid var(--divider);border-radius:10px;padding:24px}
+  .commentary h4{text-transform:uppercase;letter-spacing:.1em;font-size:12px;margin-bottom:12px;font-weight:700}
+  .commentary p{color:var(--text-mid);font-size:14px;margin-bottom:12px}
+  .commentary strong{color:var(--text-hi)}
+
+  /* Surplus + table side by side */
+  .surplus-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+  .prod-table{background:var(--bg-alt);border:1px solid var(--divider);border-radius:10px;padding:24px}
+  .prod-table h4{color:var(--decide);text-transform:uppercase;letter-spacing:.1em;font-size:12px;margin-bottom:14px;font-weight:700}
+  .prod-table table{width:100%;border-collapse:collapse;font-size:13.5px}
+  .prod-table th{text-align:left;color:var(--text-hi);font-weight:700;padding:10px 8px;border-bottom:2px solid var(--divider);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+  .prod-table th:last-child{text-align:right}
+  .prod-table td{padding:10px 8px;border-bottom:1px solid var(--divider);color:var(--text-mid)}
+  .prod-table td:last-child{text-align:right;font-weight:700}
+  .prod-table tr.highlight td{color:var(--text-hi);font-weight:700}
+  .prod-table tr.highlight td:last-child{color:var(--accent)}
+  .prod-table tr.negative td:last-child{color:var(--decide)}
+  .prod-table .footnote{margin-top:14px;font-size:12.5px;color:var(--text-mid);font-style:italic}
+
+  /* Trend strip with sparklines */
+  .trend-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .trend-card{background:var(--bg-alt);border:1px solid var(--divider);border-radius:10px;padding:20px;border-top:3px solid}
+  .trend-card.up-color{border-top-color:var(--diff)}
+  .trend-card.emerg-color{border-top-color:var(--emerg)}
+  .trend-card.down-color{border-top-color:var(--decide)}
+  .trend-card .direction{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+  .trend-card.up-color .direction{color:var(--diff)}
+  .trend-card.emerg-color .direction{color:var(--emerg)}
+  .trend-card.down-color .direction{color:var(--decide)}
+  .trend-card h5{font-size:15px;color:var(--text-hi);margin-bottom:4px;font-weight:800}
+  .trend-card .desc{color:var(--text-low);font-size:11.5px;font-style:italic;margin-bottom:10px}
+  .trend-card .spark{height:60px}
+  .trend-card .narrative{color:var(--text-mid);font-size:12px;margin-top:10px}
+  .epoch-note{margin-top:24px;padding:14px 18px;background:var(--bg-alt);border:1px solid var(--divider);border-radius:8px;color:var(--text-low);font-size:13px;font-style:italic}
+
+  /* Filter chips */
+  .filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px;align-items:center}
+  .filter-label{color:var(--text-low);font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin-right:6px}
+  .chip{border:1px solid var(--divider);background:transparent;color:var(--text-mid);border-radius:999px;padding:7px 14px;font-size:13px;cursor:pointer;transition:all .15s;font-family:inherit}
+  .chip:hover{color:var(--text-hi);border-color:var(--text-mid)}
+  .chip.active{color:var(--bg);font-weight:700}
+  .chip[data-bucket="same"].active{background:var(--same);border-color:var(--same)}
+  .chip[data-bucket="different"].active{background:var(--diff);border-color:var(--diff)}
+  .chip[data-bucket="emerging"].active{background:var(--emerg);border-color:var(--emerg)}
+  .chip[data-decision]:not([data-decision="all"]).active,.chip[data-decision="all"].active{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+  .reset{margin-left:auto;color:var(--text-low);font-size:12px;background:none;border:none;cursor:pointer;text-decoration:underline;font-family:inherit}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .card{background:var(--bg-card);border:1px solid var(--divider);border-radius:10px;padding:22px;transition:transform .15s,border-color .15s;display:flex;flex-direction:column}
+  .card:hover{transform:translateY(-2px);border-color:var(--text-low)}
+  .card.hidden{display:none}
+  .card .tag-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .tag{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border-radius:4px}
+  .tag.same{background:rgba(155,140,255,.15);color:var(--same)}
+  .tag.different{background:rgba(78,205,196,.15);color:var(--diff)}
+  .tag.emerging{background:rgba(255,210,63,.15);color:var(--emerg)}
+  .tag.decision{background:rgba(230,57,70,.12);color:var(--decide);border:1px solid rgba(230,57,70,.4)}
+  .tag.decision::before{content:'→ '}
+  .card h3{font-size:17px;font-weight:800;margin-bottom:10px;line-height:1.25}
+  .card p{color:var(--text-mid);font-size:13.5px;flex:1}
+  .card .src{margin-top:14px;font-size:11px;color:var(--text-low);font-style:italic}
+
+  .dec-rows{display:flex;flex-direction:column;gap:12px}
+  .dec-row{display:grid;grid-template-columns:80px 1fr;align-items:start;gap:20px;background:var(--bg-alt);border:1px solid var(--divider);border-left:4px solid var(--decide);border-radius:8px;padding:18px 24px}
+  .dec-row .n{font-size:32px;font-weight:900;color:var(--decide);font-family:'Arial Black',sans-serif;line-height:1}
+  .dec-row .dec-body{display:flex;flex-direction:column;gap:10px}
+  .dec-row .dec-head{display:grid;grid-template-columns:280px 1fr;gap:20px;align-items:start}
+  .dec-row .h{font-weight:800;font-size:16px;line-height:1.2}
+  .dec-row .b{color:var(--text-mid);font-size:14px}
+  .dec-drivers{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:4px;padding-top:10px;border-top:1px dashed var(--divider)}
+  .drivers-label{color:var(--decide);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-right:6px}
+  .driver-tag{background:rgba(230,57,70,.08);color:var(--text-mid);border:1px solid rgba(230,57,70,.25);border-radius:4px;padding:3px 8px;font-size:12px}
+  @media (max-width:960px){.dec-row .dec-head{grid-template-columns:1fr}}
+
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  .sn-card{background:var(--bg-alt);border:1px solid var(--divider);border-radius:10px;padding:24px}
+  .sn-card .head{text-transform:uppercase;letter-spacing:.12em;font-size:12px;font-weight:700;margin-bottom:18px;padding-bottom:14px;border-bottom:2px solid}
+  .sn-card.signal .head{color:var(--diff);border-color:var(--diff)}
+  .sn-card.noise .head{color:var(--decide);border-color:var(--decide)}
+  .sn-item{margin-bottom:18px}
+  .sn-item:last-child{margin-bottom:0}
+  .sn-item h5{font-size:14px;color:var(--text-hi);margin-bottom:5px;font-weight:700}
+  .sn-item p{color:var(--text-mid);font-size:13.5px}
+
+  .epoch-block{margin-bottom:32px}
+  .epoch-block:last-child{margin-bottom:0}
+  .epoch-header{display:flex;align-items:baseline;gap:14px;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid}
+  .epoch-block.pre .epoch-header{border-color:var(--same)} .epoch-block.post .epoch-header{border-color:var(--diff)}
+  .epoch-block.pre .epoch-label{color:var(--same)} .epoch-block.post .epoch-label{color:var(--diff)}
+  .epoch-label{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+  .epoch-range{color:var(--text-low);font-size:13px}
+  .src-list{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .src-item{background:var(--bg-alt);border:1px solid var(--divider);border-radius:8px;padding:18px}
+  .src-item .src-label{color:var(--accent);font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-bottom:8px}
+  .src-item h4{font-size:15px;margin-bottom:6px;font-weight:700}
+  .src-item p{color:var(--text-mid);font-size:13px;margin-bottom:10px}
+  .src-item a{color:var(--accent);text-decoration:none;font-size:13px;font-weight:600}
+
+  footer{padding:40px 0 60px;border-top:1px solid var(--divider);color:var(--text-low);font-size:12px;text-align:center}
+
+  @media (max-width:960px){
+    h1{font-size:42px}
+    .stat-row{grid-template-columns:1fr 1fr}
+    .grid,.trend-cols,.surplus-grid,.chart-section,.two-col,.src-list{grid-template-columns:1fr}
+    .dec-row{grid-template-columns:60px 1fr;row-gap:6px}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <div class="brand"><span class="brand-dot"></span> AI Impact · C-Suite Briefing <span class="brand-version">v3.1</span></div>
+    <div class="nav-links">
+      <a href="#dashboard">Numbers</a>
+      <a href="#exposure">Exposure</a>
+      <a href="#productivity">Productivity</a>
+      <a href="#surplus">Surplus</a>
+      <a href="#assist-vs-automate">Assist vs Automate</a>
+      <a href="#trends">Trends</a>
+      <a href="#findings">Findings</a>
+      <a href="#decisions">Decisions</a>
+      <a href="#sources">Sources</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container">
+    <span class="eyebrow">Executive briefing · Volume 3.1 · May 2026</span>
+    <h1>AI's impact on work, innovation &amp; society.</h1>
+    <p class="lede">A <strong style="color:var(--text-hi)">visual briefing</strong> on six Anthropic Economic Research reports. Nine charts and tables; sparklines tracking direction across reports; the Same / Different / Emerging framework. <strong style="color:var(--decide)">Every finding shows which of the five C-suite decisions it drives.</strong></p>
+    <div class="hero-meta">v3.1 adds: explicit finding→decision links (look for the red "Tied to D0X" pills), and a "Drivers" list under each decision that traces it back to the findings.</div>
+  </div>
+</header>
+
+<!-- HEADLINE STATS -->
+<section id="dashboard">
+  <div class="container">
+    <h2>The big picture</h2>
+    <p class="sub">Four numbers that frame the whole conversation.</p>
+    <div class="stat-row">
+      <div class="stat n1"><div class="num">~49%</div><div class="label">of U.S. jobs</div><div class="body">have ≥25% of their tasks already performed using Claude.</div><div class="src">Learning Curves, Mar 2026</div></div>
+      <div class="stat n2"><div class="num">+1.8%</div><div class="label">implied annual U.S. productivity boost</div><div class="body">if current AI is universally adopted in 10 yrs — ~2× recent rate.</div><div class="src">Productivity Gains, Nov 2025</div></div>
+      <div class="stat n3"><div class="num">5.1 / 7</div><div class="label">user productivity rating</div><div class="body">avg self-report — "substantially more productive".</div><div class="src">81k-user survey, Dec 2025</div></div>
+      <div class="stat n4"><div class="num">1 in 5</div><div class="label">workers worry about displacement</div><div class="body">top exposure quartile mentions it 3× as often as the bottom.</div><div class="src">81k-user survey, Dec 2025</div></div>
+    </div>
+    <div class="caveat">Caveat — the +1.8% figure is Anthropic's own estimate from in-conversation time savings. Past randomized trials found smaller gains (–19% to +56%). See the Surplus section for the full comparison.</div>
+  </div>
+</section>
+
+<!-- EXPOSURE CHART -->
+<section id="exposure">
+  <div class="container">
+    <h2>Where Claude's task coverage is highest</h2>
+    <p class="sub">The leading edge of AI exposure — which occupations are most exposed to Claude usage today.</p>
+    <div class="chart-section">
+      <div class="chart-card">
+        <div class="chart-title" style="color:var(--accent)">TOP 10 MOST EXPOSED OCCUPATIONS · % OF TASKS COVERED</div>
+        <canvas id="chart-exposure"></canvas>
+      </div>
+      <div class="commentary">
+        <h4 style="color:var(--accent)">Read this chart</h4>
+        <p>Computer Programmers lead at <strong>75%</strong> coverage. Customer Service Reps are next — driven by automated API traffic, not in-chat use.</p>
+        <p><strong>30% of workers</strong>, meanwhile, have zero coverage: cooks, mechanics, lifeguards, bartenders.</p>
+        <p>More exposed workers are <strong>older, more female, more educated, and earn 47% more on average</strong> — flipping the historical pattern of automation hitting blue-collar work first.</p>
+        <p style="font-size:12px;color:var(--text-low);font-style:italic;margin-top:18px">Source: Labor Market Impacts of AI, Mar 2026 (Fig 3). Top + bottom values confirmed; middle approximated.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTIVITY BY OCCUPATION -->
+<section id="productivity">
+  <div class="container">
+    <h2>Where productivity actually lands</h2>
+    <p class="sub">Self-reported productivity gain (1–7 scale) by occupation category.</p>
+    <div class="chart-section">
+      <div class="chart-card">
+        <div class="chart-title" style="color:var(--diff)">PRODUCTIVITY RATING BY OCCUPATION (1–7 SCALE)</div>
+        <canvas id="chart-productivity"></canvas>
+      </div>
+      <div class="commentary">
+        <h4 style="color:var(--diff)">The barbell</h4>
+        <p>Management leads — <strong>mostly entrepreneurs</strong> using Claude to build businesses. Computer &amp; Math (software developers) close behind.</p>
+        <p>Lawyers and scientists report <strong>the lowest gains</strong> — precise instructions still trip Claude up: "it diverges every time."</p>
+        <p>Not visible here: the lowest wage quartile ALSO reports elevated gains — delivery drivers building e-commerce, landscapers building apps. A <strong>barbell, not a ramp</strong>.</p>
+        <p style="font-size:12px;color:var(--text-low);font-style:italic;margin-top:18px">Source: 81,000-user survey, Dec 2025 (Fig 3, right panel). Values approximated from chart imagery.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SURPLUS DONUT + TABLE -->
+<section id="surplus">
+  <div class="container">
+    <h2>Where the surplus goes</h2>
+    <p class="sub">Who's capturing the productivity gain? And how big is the gain, really?</p>
+    <div class="surplus-grid">
+      <div class="chart-card small">
+        <div class="chart-title" style="color:var(--same)">WHO BENEFITS FROM AI PRODUCTIVITY GAINS</div>
+        <canvas id="chart-surplus"></canvas>
+      </div>
+      <div class="prod-table">
+        <h4>Productivity gain estimates — in-chat vs. controlled trials</h4>
+        <table>
+          <thead><tr><th>Source</th><th>Domain</th><th>Time saved</th></tr></thead>
+          <tbody>
+            <tr class="highlight"><td>Anthropic (in-chat est.)</td><td>All tasks (Claude.ai)</td><td>80%</td></tr>
+            <tr><td>GitHub Copilot RCT</td><td>Software</td><td>+56%</td></tr>
+            <tr><td>Noy &amp; Zhang RCT</td><td>Writing</td><td>+40%</td></tr>
+            <tr><td>Cui et al. RCT</td><td>Software</td><td>+26%</td></tr>
+            <tr><td>Brynjolfsson RCT</td><td>Customer support</td><td>+14%</td></tr>
+            <tr class="negative"><td>METR (2025)</td><td>Expert OS dev</td><td>–19%</td></tr>
+          </tbody>
+        </table>
+        <div class="footnote">The gap between Anthropic's 80% in-chat estimate and the RCT range is the unmeasured cost of validating, refining, and integrating AI output. Treat Anthropic's number as a <strong style="color:var(--text-hi)">ceiling</strong>, not a forecast.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AUGMENTATION VS AUTOMATION -->
+<section id="assist-vs-automate">
+  <div class="container">
+    <h2>Augmentation vs automation over time</h2>
+    <p class="sub">The single most important trend for "assist vs automate" decisions.</p>
+    <div class="chart-section">
+      <div class="chart-card">
+        <div class="chart-title" style="color:var(--diff)">SHARE OF CLAUDE.AI CONVERSATIONS (%)</div>
+        <canvas id="chart-augaut"></canvas>
+      </div>
+      <div class="commentary">
+        <h4 style="color:var(--diff)">Watch the crossover</h4>
+        <p>August 2025: automation <strong>briefly took the lead</strong> (56% vs 42%) — then augmentation rebounded.</p>
+        <p>On the API surface (not shown), automation is dominant and growing — <strong>business sales and trading both doubled</strong> in 3 months.</p>
+        <p><strong>Implication:</strong> the "assist vs automate" question is being answered differently on each surface. Pick the right one per workflow, or watch your AI investment leak.</p>
+        <p style="font-size:12px;color:var(--text-low);font-style:italic;margin-top:18px">Sources: Economic Primitives (Jan 2026, Fig 1.3) + Learning Curves (Mar 2026). Feb 2026 value approximated.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- U-CURVE -->
+<section id="ucurve">
+  <div class="container">
+    <h2>Signature insight: the U-curve paradox</h2>
+    <p class="sub">The faster AI makes you, the more worried you get. Verified against the full 81,000-user PDF.</p>
+    <div class="chart-section">
+      <div class="chart-card"><div class="chart-title" style="color:var(--accent)">SHARE REPORTING JOB-THREAT CONCERN BY REPORTED SPEEDUP</div><canvas id="chart-ucurve"></canvas></div>
+      <div class="commentary">
+        <h4 style="color:var(--accent)">Why this matters</h4>
+        <p><strong>Two groups worry most.</strong></p>
+        <p>Those AI <em>slows down</em> — creatives who find it rigid, yet see it spreading into their field.</p>
+        <p>Those AI <em>speeds up the most</em> — if tasks take 1/4 the time, what does that mean for headcount?</p>
+        <p><strong>Implication:</strong> treat AI rollouts as a change-management problem. Reassurance and re-scoping matter as much as the tool.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TREND STRIP WITH SPARKLINES -->
+<section id="trends">
+  <div class="container">
+    <h2>How key metrics have evolved</h2>
+    <p class="sub">Direction matters more than level. Sparklines across five Economic Index reports — Sep 2025 to Feb 2026.</p>
+    <div class="trend-cols" id="trend-strip"></div>
+    <div class="epoch-note"><strong style="color:var(--text-hi)">Methodology epoch break:</strong> Anthropic introduced new "economic primitives" in Jan 2026. Pre-Jan 2026 numbers aren't strictly comparable to post-Jan 2026 numbers. Sparkline endpoints approximate where exact monthly values aren't published.</div>
+  </div>
+</section>
+
+<!-- INTERACTIVE FINDINGS -->
+<section id="findings">
+  <div class="container">
+    <h2>Findings — filter by lens or by decision</h2>
+    <p class="sub">Same as past tech waves · Different this time · Still emerging. A red pill on a card (e.g. <span class="tag decision" style="display:inline-block">D01</span>) marks which of the five C-suite decisions that finding drives. Use the chips below to filter.</p>
+    <div class="filters" id="bucket-filters">
+      <span class="filter-label">Lens</span>
+      <button class="chip active" data-bucket="all">All</button>
+      <button class="chip" data-bucket="same">Same as past waves</button>
+      <button class="chip" data-bucket="different">Different this time</button>
+      <button class="chip" data-bucket="emerging">Still emerging</button>
+      <button class="reset" id="reset-btn">Reset</button>
+    </div>
+    <div class="filters" id="decision-filters">
+      <span class="filter-label">Tied to decision</span>
+      <button class="chip active" data-decision="all">All</button>
+      <button class="chip" data-decision="01">D01 · Entry-level pipeline</button>
+      <button class="chip" data-decision="02">D02 · Surplus-sharing</button>
+      <button class="chip" data-decision="03">D03 · Assist vs automate</button>
+      <button class="chip" data-decision="04">D04 · Internal measurement</button>
+      <button class="chip" data-decision="05">D05 · Agent governance</button>
+    </div>
+    <div class="grid" id="findings-grid"></div>
+  </div>
+</section>
+
+<section id="decisions">
+  <div class="container">
+    <h2>Five decisions the C-suite cannot defer</h2>
+    <p class="sub">Each is being decided implicitly right now — by inaction if not by action.</p>
+    <div class="dec-rows" id="decisions-list"></div>
+  </div>
+</section>
+
+<section id="noise">
+  <div class="container">
+    <h2>Cutting through the noise</h2>
+    <p class="sub">What to weight heavily — and what to discount — when the next AI report or headline lands on your desk.</p>
+    <div class="two-col">
+      <div class="sn-card signal">
+        <div class="head">Weight heavily (signal)</div>
+        <div class="sn-item"><h5>First-party, longitudinal data</h5><p>Monthly cadence measuring actual usage — Anthropic's Economic Index now publishes monthly.</p></div>
+        <div class="sn-item"><h5>Combined qual + quant</h5><p>Worker-experience surveys layered onto usage data show change before it reaches official labor statistics.</p></div>
+        <div class="sn-item"><h5>Sector-level exposure measures</h5><p>% of tasks performed with AI by occupation is the closest thing to a leading indicator we have.</p></div>
+        <div class="sn-item"><h5>Decisions visibly being made</h5><p>Procurement standards, regulator filings, real layoff/hiring patterns by job family.</p></div>
+      </div>
+      <div class="sn-card noise">
+        <div class="head">Discount (noise)</div>
+        <div class="sn-item"><h5>Vendor benchmark claims</h5><p>"Our model is 10× faster" tells you nothing about adoption, retention, or value capture.</p></div>
+        <div class="sn-item"><h5>Single-anecdote layoff headlines</h5><p>One company replacing N roles is news, not evidence. Look for sector-wide patterns.</p></div>
+        <div class="sn-item"><h5>Single-source productivity claims</h5><p>Anthropic's 80% in-chat estimate vs. RCTs at –19% to +56%. Triangulate (see the table above).</p></div>
+        <div class="sn-item"><h5>Existential debates</h5><p>Engaging but rarely decision-relevant. Filter to: what would you do differently next quarter?</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="sources">
+  <div class="container">
+    <h2>Sources in this volume</h2>
+    <p class="sub">Six Anthropic Economic Research reports, grouped by methodology epoch. A living library — new reports plug in here.</p>
+    <div id="sources-grouped"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>AI Impact Briefing · v3.1 · May 2026 · Built on six Anthropic Economic Research reports · Findings now linked to the five C-suite decisions</p>
+  </div>
+</footer>
+
+<script>
+// ===================================================================
+// COLOR + CHART DEFAULTS
+// ===================================================================
+const COLORS = { bg:'#0A0E27', bgAlt:'#121732', textHi:'#F5F5F7', textMid:'#B8BCC8', textLow:'#6B7080', accent:'#FF6B35', same:'#9B8CFF', diff:'#4ECDC4', emerg:'#FFD23F', decide:'#E63946', divider:'#2A2F4F' };
+Chart.defaults.color = COLORS.textMid;
+Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
+const commonGrid = { color: 'rgba(42,47,79,0.6)' };
+const tooltip = { backgroundColor: COLORS.bgAlt, borderColor: COLORS.divider, borderWidth:1, titleColor: COLORS.textHi, bodyColor: COLORS.textMid };
+
+// ===================================================================
+// DATA
+// ===================================================================
+const FINDINGS = [
+  { bucket:'same', title:'Productivity paradox / J-curve', body:"Investment precedes measurable output. Electricity (1880s–1920s) and IT (1970s–90s) showed long lags. Anthropic's 1.8% productivity claim is itself an upper bound that ignores adoption delay.", src:'Historical + Productivity Gains, Nov 2025', decisions:["04"] },
+  { bucket:'same', title:'Anxiety tracks exposure, not reality (yet)', body:"Workers in highly-exposed roles worry most. Same pattern as ATMs, robotics, offshoring. Labor Market Impacts (Mar 2026) finds NO systematic rise in unemployment for exposed workers since late 2022.", src:'Labor Market Impacts, Mar 2026', decisions:[] },
+  { bucket:'same', title:'Higher-skill workers benefit first', body:"Software engineers and managers report the largest gains. Skill-biased technical change — high-tenure users get 3-5pp better outcomes, controlling for task selection.", src:'Learning Curves, Mar 2026', decisions:[] },
+  { bucket:'same', title:'Geographic & demographic gaps that narrow', body:"Top-5 US states fell from 30% → 24% share of usage in 6 months. Convergence happens, just slower than the news cycle suggests.", src:'Learning Curves, Mar 2026', decisions:[] },
+  { bucket:'same', title:'Diffusion is slower than headline capability', body:"Claude covers just 33% of theoretically feasible Computer & Math tasks. The capability ceiling is much higher than current usage — adoption, not capability, is the bottleneck.", src:'Labor Market Impacts, Mar 2026', decisions:["03"] },
+
+  { bucket:'different', title:'Speed of adoption', body:"~49% of jobs already have ≥25% of tasks touched by Claude in <3 years. Electricity took a generation.", src:'Learning Curves, Mar 2026', decisions:["03","05"] },
+  { bucket:'different', title:'Cognitive, not physical', body:"Past waves automated routine and physical work. This wave automates judgment, writing, and analysis.", src:'All Anthropic reports', decisions:["01"] },
+  { bucket:'different', title:'White collar exposed first', body:"Top exposed: Computer Programmers (75% coverage), Customer Service Reps, Data Entry Keyers (67%). Historic blue-collar-first pattern inverted.", src:'Labor Market Impacts, Mar 2026', decisions:["01"] },
+  { bucket:'different', title:'Entry-level disproportionately exposed', body:"Young workers (22-25) into exposed roles: ~14% drop in job-finding rate vs 2022. Just barely significant — but the apprenticeship pipeline is now a strategic risk.", src:'Labor Market Impacts (Mar 2026) + 81k survey', decisions:["01"] },
+  { bucket:'different', title:'Scope > Speed', body:"48% of users describe doing NEW tasks they couldn't before (vs 40% who do existing tasks faster). Net-new capability is the dominant story.", src:'81k-user survey, Dec 2025', decisions:[] },
+  { bucket:'different', title:'Dual-channel deployment', body:"Consumer 'assist' AND API 'automate' growing simultaneously. API computer-and-math +14%; Claude.ai same category –18% over six months.", src:'Learning Curves, Mar 2026', decisions:["03"] },
+  { bucket:'different', title:'Barbell of gains', body:"Highest-paid AND some lowest-paid report the largest gains — delivery drivers building e-commerce, landscapers building apps. Pure skill-bias doesn't fit.", src:'81k-user survey (Fig 3)', decisions:[] },
+  { bucket:'different', title:'Learning curves matter', body:"High-tenure Claude users have 3-5pp higher success rate, controlling for task. Skill in *using* AI is itself a new form of skill-biased technical change.", src:'Learning Curves, Mar 2026', decisions:["04"] },
+
+  { bucket:'emerging', title:'Where the surplus settles', body:"Most users say AI gains accrue to them; 10% already say employers/clients capture it. The wage-vs-profit split is being decided in this window.", src:'81k-user survey (Fig 4)', decisions:["02"] },
+  { bucket:'emerging', title:'The U-curve paradox', body:"Workers experiencing the LARGEST speedups are MORE worried about displacement, not less. Fast wins ≠ job security; the human reaction is non-linear.", src:'81k-user survey (Fig 6) — verified against PDF', decisions:["01","04"] },
+  { bucket:'emerging', title:'Real productivity vs estimated', body:"Anthropic's in-chat estimate: 80% time savings. Past RCTs: –19% to +56%. The gap is the unmeasured cost of validating and refining AI output.", src:'Productivity Gains, Nov 2025', decisions:["04"] },
+  { bucket:'emerging', title:'Hiring of early-career workers', body:"Tentative slowdown — ~14% drop in job-finding rate. Not yet definitive but consistent across reports.", src:'Labor Market Impacts, Mar 2026', decisions:["01"] },
+  { bucket:'emerging', title:'Net job creation vs destruction', body:"Solopreneurs use AI to launch businesses. Whether AI creates new task categories at scale, or mainly compresses existing ones, is unsettled.", src:'81k-user survey · qualitative', decisions:[] },
+  { bucket:'emerging', title:'Quality & trust ceiling', body:"Lawyers and scientists report the lowest gains — AI 'diverges every time' on precise instructions. High-stakes sectors hit a quality wall first.", src:'81k-user survey (Fig 3, right panel)', decisions:["05"] },
+  { bucket:'emerging', title:'Worker consent & sentiment', body:"Some respondents say AI is 'imposed on them by their employers' and feels stifling. Mandates without choice damage culture and retention.", src:'81k-user survey · qualitative', decisions:["02","04"] },
+  { bucket:'emerging', title:'Bottleneck tasks', body:"As AI accelerates some tasks, others become bottlenecks. A home inspector's report-writing speeds up; the site visit doesn't. Watch what becomes the new constraint.", src:'Productivity Gains, Nov 2025', decisions:["03"] },
+];
+
+const DECISIONS = [
+  { n:'01', h:'Re-architect the entry-level pipeline', b:'Young-worker hiring into exposed roles already down ~14%. Decide deliberately how to keep developing future senior talent.' },
+  { n:'02', h:'Set the surplus-sharing rule', b:'Workers feel gains today; 10% already say employers capture them. The wage-vs-profit split is being set NOW.' },
+  { n:'03', h:"Choose 'assist' or 'automate' per workflow", b:'Coding migrating Claude.ai → API (–18% / +14%). Picking the wrong mode per workflow is the most expensive AI decision.' },
+  { n:'04', h:'Stand up internal measurement', b:'Macro data lags by quarters. Track output, time-to-task, skill mix, error rates yourself.' },
+  { n:'05', h:'Govern the shift to agents', b:'API automation in sales/trading doubling every 3 months. Decide who approves an AI agent going live, what triggers rollback.' },
+];
+
+const SOURCES_BY_EPOCH = {
+  post: { label:'Post-primitives epoch · Jan 2026 onward', sub:'New economic primitives framework; finer measurement', items: [
+    { label:'Source 01', title:"'What 81,000 people told us about the economics of AI'", desc:'Companion report; 81,000 open-ended responses from Claude users (Dec 2025). Verified against full PDF.', date:'Apr 22, 2026', url:'https://www.anthropic.com/research/81k-economics' },
+    { label:'Source 02', title:'Announcing the Anthropic Economic Index Survey', desc:'Launches a monthly survey via Anthropic Interviewer — recurring qualitative signal.', date:'Apr 22, 2026', url:'https://www.anthropic.com/research/economic-index-survey-announcement' },
+    { label:'Source 03', title:"Anthropic Economic Index: 'Learning Curves'", desc:"5th Economic Index. Feb 2026 data. Usage diversification, model selection by task wage, API ⇄ Claude.ai divergence.", date:'Mar 24, 2026', url:'https://www.anthropic.com/research/economic-index-march-2026-report' },
+    { label:'Source 04', title:'Labor market impacts of AI: A new measure and early evidence', desc:"Introduces 'observed exposure'. No systematic unemployment rise yet, but ~14% drop in young-worker hiring.", date:'Mar 5, 2026', url:'https://www.anthropic.com/research/labor-market-impacts' },
+    { label:'Source 05', title:'Anthropic Economic Index report: Economic Primitives', desc:'Introduces the five-primitives framework. Epoch boundary for trend comparison.', date:'Jan 15, 2026', url:'https://www.anthropic.com/research/anthropic-economic-index-january-2026-report' },
+  ]},
+  pre: { label:'Pre-primitives epoch · before Jan 2026', sub:'Older measurement framework; baseline data', items: [
+    { label:'Source 06', title:'Estimating AI productivity gains from Claude conversations', desc:'Methodology behind the +1.8% productivity-boost headline. Compares to past RCTs and explains bottleneck tasks.', date:'Nov 25, 2025', url:'https://www.anthropic.com/research/estimating-productivity-gains' },
+  ]}
+};
+
+// ===================================================================
+// CHARTS
+// ===================================================================
+
+// 1. Exposure horizontal bar
+function makeExposureChart() {
+  const labels = ["Computer Programmers","Customer Service Reps","Software Developers","Word Processors / Typists","Telemarketers","Computer Sys Analysts","Tax Preparers","Financial Analysts","Insurance Underwriters","Data Entry Keyers"];
+  const values = [75, 71, 70, 70, 69, 69, 68, 68, 68, 67];
+  new Chart(document.getElementById('chart-exposure'), {
+    type:'bar',
+    data:{ labels, datasets:[{ label:'% coverage', data:values, backgroundColor: COLORS.accent, borderRadius:4 }] },
+    options:{
+      indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip, datalabels:false },
+      scales:{
+        x:{ beginAtZero:true, max:100, grid: commonGrid, ticks:{ callback:v=>v+'%' } },
+        y:{ grid:{ display:false } }
+      }
+    }
+  });
+}
+
+// 2. Productivity by occupation
+function makeProductivityChart() {
+  const labels = ["Management","Computer & Math","Architecture / Eng","Education","Office & Admin","Business / Finance","Sales","Healthcare","Arts / Media","Legal","Scientific"];
+  const values = [5.5, 5.4, 5.2, 5.2, 5.1, 5.0, 5.0, 4.9, 4.9, 4.8, 4.7];
+  new Chart(document.getElementById('chart-productivity'), {
+    type:'bar',
+    data:{ labels, datasets:[{ label:'Productivity rating (1-7)', data:values, backgroundColor: COLORS.diff, borderRadius:4 }] },
+    options:{
+      indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip },
+      scales:{
+        x:{ min:4.0, max:6.5, grid: commonGrid },
+        y:{ grid:{ display:false } }
+      }
+    }
+  });
+}
+
+// 3. Surplus donut
+function makeSurplusChart() {
+  new Chart(document.getElementById('chart-surplus'), {
+    type:'doughnut',
+    data:{
+      labels:["Workers / self","Employers / clients","Consumers","AI companies","Net negative"],
+      datasets:[{ data:[70,10,8,7,5], backgroundColor:[COLORS.accent, COLORS.decide, COLORS.diff, COLORS.same, COLORS.textLow], borderColor: COLORS.bgAlt, borderWidth:3 }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false, cutout:'55%',
+      plugins:{
+        legend:{ position:'bottom', labels:{ color: COLORS.textMid, font:{ size:12 }, padding:14 } },
+        tooltip: { ...tooltip, callbacks: { label: c => c.label + ': ' + c.parsed + '%' } }
+      }
+    }
+  });
+}
+
+// 4. Augmentation vs Automation
+function makeAugAutChart() {
+  new Chart(document.getElementById('chart-augaut'), {
+    type:'line',
+    data:{
+      labels:["Jan 2025","May 2025","Aug 2025","Nov 2025","Feb 2026"],
+      datasets:[
+        { label:'Augmentation', data:[56,55,42,55,53], borderColor: COLORS.diff, backgroundColor: 'rgba(78,205,196,0.15)', borderWidth:3, tension:0.4, pointRadius:6, pointBackgroundColor: COLORS.diff },
+        { label:'Automation', data:[41,42,56,42,44], borderColor: COLORS.accent, backgroundColor: 'rgba(255,107,53,0.15)', borderWidth:3, tension:0.4, pointRadius:6, pointBackgroundColor: COLORS.accent },
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ position:'top', labels:{ color: COLORS.textMid } }, tooltip },
+      scales:{
+        x:{ grid:{ display:false }, ticks:{ color: COLORS.textMid } },
+        y:{ min:30, max:65, grid: commonGrid, ticks:{ callback:v=>v+'%' } }
+      }
+    }
+  });
+}
+
+// 5. U-curve
+function makeUCurve() {
+  new Chart(document.getElementById('chart-ucurve'), {
+    type:'line',
+    data:{
+      labels:['Much slower','Slower','Slight slow','No change','Slight faster','Faster','Much faster'],
+      datasets:[{ label:'% expressing displacement concern', data:[28,18,14,12,15,19,26], borderColor: COLORS.accent, backgroundColor:'rgba(255,107,53,0.15)', borderWidth:3, pointRadius:6, pointBackgroundColor: COLORS.accent, tension:0.4, fill:true }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip },
+      scales:{
+        x:{ title:{ display:true, text:'Self-reported AI speedup at work (1=much slower, 4=no change, 7=much faster)', color: COLORS.textMid }, ticks:{ color: COLORS.textMid }, grid:{ display:false } },
+        y:{ title:{ display:true, text:'% expressing displacement concern', color: COLORS.textMid }, ticks:{ color: COLORS.textMid }, grid: commonGrid, beginAtZero:true }
+      }
+    }
+  });
+}
+
+// 6. Sparklines for trend strip
+const SPARKS = [
+  { label:'Job coverage breadth', desc:'% jobs ≥25% covered', values:[25,35,49,49], color: COLORS.diff, arrow:'↗', direction:'RISING', dirClass:'up-color', narrative:'Stable in Feb after rapid expansion.' },
+  { label:'Top-5 US states share', desc:'Geographic spread', values:[30,28,26,24], color: COLORS.diff, arrow:'↘', direction:'CONVERGING', dirClass:'up-color', narrative:'US within-country: gap closing.' },
+  { label:'Top-20 countries share', desc:'Global concentration', values:[45,46,47,48], color: COLORS.emerg, arrow:'↗', direction:'DIVERGING', dirClass:'emerg-color', narrative:'Globally: gap widening.' },
+  { label:'Avg task wage (Claude.ai)', desc:'USD per task', values:[49.3,49.0,48.4,47.9], color: COLORS.diff, arrow:'↘', direction:'BROADENING', dirClass:'up-color', narrative:'Adoption spreading to lower-wage tasks.' },
+  { label:'Young-worker hiring', desc:'Exposed roles, % of 2022', values:[100,95,90,86], color: COLORS.decide, arrow:'↘', direction:'EARLY SIGNAL', dirClass:'down-color', narrative:'~14% drop, just barely significant.' },
+  { label:'Augmentation share', desc:'Claude.ai conversations %', values:[56,42,55,53], color: COLORS.emerg, arrow:'⇄', direction:'OSCILLATING', dirClass:'emerg-color', narrative:'Briefly flipped to automation in Aug 2025.' },
+];
+
+function renderTrendStrip() {
+  const root = document.getElementById('trend-strip');
+  root.innerHTML = SPARKS.map((sp, i) => `
+    <div class="trend-card ${sp.dirClass}">
+      <div class="direction">${sp.direction} &nbsp; ${sp.arrow}</div>
+      <h5>${sp.label}</h5>
+      <div class="desc">${sp.desc}</div>
+      <div class="spark"><canvas id="spark-${i}"></canvas></div>
+      <div class="narrative">${sp.narrative}</div>
+    </div>
+  `).join('');
+
+  SPARKS.forEach((sp, i) => {
+    const ctx = document.getElementById('spark-' + i).getContext('2d');
+    new Chart(ctx, {
+      type:'line',
+      data:{ labels: sp.values.map(()=>''), datasets:[{ data: sp.values, borderColor: sp.color, backgroundColor:'transparent', borderWidth:3, tension:0.4, pointRadius:4, pointBackgroundColor: sp.color }] },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{display:false}, tooltip:{ ...tooltip, callbacks:{ title:()=>'' } } },
+        scales:{ x:{ display:false }, y:{ display:false } }
+      }
+    });
+  });
+}
+
+// ===================================================================
+// RENDER FINDINGS / DECISIONS / SOURCES
+// ===================================================================
+function labelFor(b){ return {same:'Same as past', different:'Different this time', emerging:'Still emerging'}[b]; }
+
+function renderFindings(){
+  document.getElementById('findings-grid').innerHTML = FINDINGS.map(f => {
+    const decPills = (f.decisions || []).map(d => `<span class="tag decision" title="Tied to Decision ${d}">D${d}</span>`).join('');
+    const dataDec = (f.decisions || []).join(',');
+    return `
+    <div class="card" data-bucket="${f.bucket}" data-decisions="${dataDec}">
+      <div class="tag-row">
+        <span class="tag ${f.bucket}">${labelFor(f.bucket)}</span>
+        ${decPills}
+      </div>
+      <h3>${f.title}</h3>
+      <p>${f.body}</p>
+      <div class="src">${f.src}</div>
+    </div>`;
+  }).join('');
+}
+function renderDecisions(){
+  // Build a reverse-index: for each decision number, list the finding titles that point to it
+  const driversByDec = {};
+  for (const f of FINDINGS) for (const d of (f.decisions || [])) {
+    (driversByDec[d] = driversByDec[d] || []).push(f.title);
+  }
+  document.getElementById('decisions-list').innerHTML = DECISIONS.map(d => {
+    const drivers = (driversByDec[d.n] || []);
+    const driverHTML = drivers.length
+      ? `<div class="dec-drivers"><span class="drivers-label">Drivers:</span> ${drivers.map(t => `<span class="driver-tag">${t}</span>`).join('')}</div>`
+      : '';
+    return `<div class="dec-row">
+      <div class="n">${d.n}</div>
+      <div class="dec-body">
+        <div class="dec-head">
+          <div class="h">${d.h}</div>
+          <div class="b">${d.b}</div>
+        </div>
+        ${driverHTML}
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderSources(){
+  const root = document.getElementById('sources-grouped');
+  let html = '';
+  for (const key of ['post','pre']) {
+    const group = SOURCES_BY_EPOCH[key];
+    html += `<div class="epoch-block ${key}">
+      <div class="epoch-header"><span class="epoch-label">${group.label}</span><span class="epoch-range">${group.sub}</span></div>
+      <div class="src-list">${group.items.map(s => `
+        <div class="src-item">
+          <div class="src-label">${s.label} · ${s.date}</div>
+          <h4>${s.title}</h4>
+          <p>${s.desc}</p>
+          <a href="${s.url}" target="_blank" rel="noopener">Open source →</a>
+        </div>`).join('')}</div></div>`;
+  }
+  root.innerHTML = html;
+}
+
+// FILTERS
+let activeBucket='all', activeDecision='all';
+function applyFilters(){
+  document.querySelectorAll('#findings-grid .card').forEach(card => {
+    const bucketOk = activeBucket==='all' || card.dataset.bucket===activeBucket;
+    const decs = (card.dataset.decisions || '').split(',').filter(Boolean);
+    const decOk = activeDecision==='all' || decs.includes(activeDecision);
+    card.classList.toggle('hidden', !(bucketOk && decOk));
+  });
+}
+document.getElementById('bucket-filters').addEventListener('click', e => {
+  if(!e.target.matches('.chip')) return;
+  document.querySelectorAll('#bucket-filters .chip').forEach(c => c.classList.remove('active'));
+  e.target.classList.add('active');
+  activeBucket = e.target.dataset.bucket;
+  applyFilters();
+});
+document.getElementById('decision-filters').addEventListener('click', e => {
+  if(!e.target.matches('.chip')) return;
+  document.querySelectorAll('#decision-filters .chip').forEach(c => c.classList.remove('active'));
+  e.target.classList.add('active');
+  activeDecision = e.target.dataset.decision;
+  applyFilters();
+});
+document.getElementById('reset-btn').addEventListener('click', () => {
+  activeBucket='all'; activeDecision='all';
+  document.querySelectorAll('#bucket-filters .chip').forEach(c => c.classList.toggle('active', c.dataset.bucket==='all'));
+  document.querySelectorAll('#decision-filters .chip').forEach(c => c.classList.toggle('active', c.dataset.decision==='all'));
+  applyFilters();
+});
+
+// INIT
+document.addEventListener('DOMContentLoaded', () => {
+  renderFindings();
+  renderDecisions();
+  renderSources();
+  renderTrendStrip();
+  makeExposureChart();
+  makeProductivityChart();
+  makeSurplusChart();
+  makeAugAutChart();
+  makeUCurve();
+});
+</script>
+</body>
+</html>
