@@ -3,13 +3,14 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AI Impact Briefing — C-Suite v3.1</title>
+<title>AI Impact Briefing — C-Suite v4</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
   :root {
     --bg:#0A0E27; --bg-alt:#121732; --bg-card:#161B3D;
     --text-hi:#F5F5F7; --text-mid:#B8BCC8; --text-low:#6B7080;
     --accent:#FF6B35; --same:#9B8CFF; --diff:#4ECDC4; --emerg:#FFD23F; --decide:#E63946;
+    --anthropic:#FF6B35; --microsoft:#00BCF2;
     --divider:#2A2F4F;
     --max:1280px;
   }
@@ -115,6 +116,13 @@
   .tag.emerging{background:rgba(255,210,63,.15);color:var(--emerg)}
   .tag.decision{background:rgba(230,57,70,.12);color:var(--decide);border:1px solid rgba(230,57,70,.4)}
   .tag.decision::before{content:'→ '}
+  .tag.provider-tag.anthropic{background:rgba(255,107,53,.12);color:var(--anthropic);border:1px solid rgba(255,107,53,.4)}
+  .tag.provider-tag.microsoft{background:rgba(0,188,242,.12);color:var(--microsoft);border:1px solid rgba(0,188,242,.4)}
+  .tag.provider-tag.both{background:rgba(78,205,196,.12);color:var(--diff);border:1px solid rgba(78,205,196,.4)}
+  .chip[data-provider="Anthropic"].active{background:var(--anthropic);border-color:var(--anthropic);color:var(--bg)}
+  .chip[data-provider="Microsoft"].active{background:var(--microsoft);border-color:var(--microsoft);color:var(--bg)}
+  .chip[data-provider="Both"].active{background:var(--diff);border-color:var(--diff);color:var(--bg)}
+  .chip[data-provider="all"].active{background:var(--text-mid);border-color:var(--text-mid);color:var(--bg)}
   .card h3{font-size:17px;font-weight:800;margin-bottom:10px;line-height:1.25}
   .card p{color:var(--text-mid);font-size:13.5px;flex:1}
   .card .src{margin-top:14px;font-size:11px;color:var(--text-low);font-style:italic}
@@ -155,6 +163,29 @@
   .src-item p{color:var(--text-mid);font-size:13px;margin-bottom:10px}
   .src-item a{color:var(--accent);text-decoration:none;font-size:13px;font-weight:600}
 
+  /* Provider badge */
+  .provider-badge{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:4px;background:rgba(0,0,0,.2);border:1px solid;margin-left:10px;vertical-align:middle}
+  .provider-badge.anthropic{color:var(--anthropic);border-color:var(--anthropic)}
+  .provider-badge.microsoft{color:var(--microsoft);border-color:var(--microsoft)}
+  h2 .provider-badge{font-size:10.5px}
+
+  /* Source group cards (sources section) */
+  .epoch-block.microsoft .epoch-header{border-color:var(--microsoft)}
+  .epoch-block.microsoft .epoch-label{color:var(--microsoft)}
+  .epoch-block.anthropic .epoch-header{border-color:var(--anthropic)}
+  .epoch-block.anthropic .epoch-label{color:var(--anthropic)}
+
+  /* Two-lab triangulation strip */
+  .triangle-strip{margin-top:24px;padding:18px 22px;background:var(--bg-alt);border:1px solid var(--diff);border-radius:8px}
+  .triangle-strip .label{color:var(--diff);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+  .triangle-strip p{color:var(--text-mid);font-size:13.5px}
+
+  /* Manager callout */
+  .mgr-callout{margin-top:14px;padding:12px 16px;background:rgba(0,188,242,.08);border:1px solid var(--microsoft);border-radius:6px}
+  .mgr-callout .label{color:var(--microsoft);font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+  .mgr-callout p{color:var(--text-mid);font-size:13px}
+  .mgr-callout strong{color:var(--text-hi)}
+
   footer{padding:40px 0 60px;border-top:1px solid var(--divider);color:var(--text-low);font-size:12px;text-align:center}
 
   @media (max-width:960px){
@@ -169,13 +200,14 @@
 
 <nav>
   <div class="container">
-    <div class="brand"><span class="brand-dot"></span> AI Impact · C-Suite Briefing <span class="brand-version">v3.1</span></div>
+    <div class="brand"><span class="brand-dot"></span> AI Impact · C-Suite Briefing <span class="brand-version">v4</span></div>
     <div class="nav-links">
       <a href="#dashboard">Numbers</a>
       <a href="#exposure">Exposure</a>
       <a href="#productivity">Productivity</a>
       <a href="#surplus">Surplus</a>
-      <a href="#assist-vs-automate">Assist vs Automate</a>
+      <a href="#paradox">Transformation Paradox</a>
+      <a href="#assist-vs-automate">Agents</a>
       <a href="#trends">Trends</a>
       <a href="#findings">Findings</a>
       <a href="#decisions">Decisions</a>
@@ -186,10 +218,10 @@
 
 <header class="hero">
   <div class="container">
-    <span class="eyebrow">Executive briefing · Volume 3.1 · May 2026</span>
+    <span class="eyebrow">Executive briefing · Volume 4 · May 2026</span>
     <h1>AI's impact on work, innovation &amp; society.</h1>
-    <p class="lede">A <strong style="color:var(--text-hi)">visual briefing</strong> on six Anthropic Economic Research reports. Nine charts and tables; sparklines tracking direction across reports; the Same / Different / Emerging framework. <strong style="color:var(--decide)">Every finding shows which of the five C-suite decisions it drives.</strong></p>
-    <div class="hero-meta">v3.1 adds: explicit finding→decision links (look for the red "Tied to D0X" pills), and a "Drivers" list under each decision that traces it back to the findings.</div>
+    <p class="lede">Now <strong style="color:var(--text-hi)">triangulated across two labs</strong> — <span style="color:var(--anthropic)">Anthropic</span> and <span style="color:var(--microsoft)">Microsoft</span>. Where they agree, the signal hardens. Where they differ, the questions sharpen. <strong style="color:var(--decide)">Every finding shows which of seven C-suite decisions it drives.</strong></p>
+    <div class="hero-meta">v4 adds: Microsoft Work Trend Index 2026 · the Transformation Paradox (org factors = 2× individual) · 15× YoY agent growth · two new decisions (D06 Equip managers, D07 Build a Learning System).</div>
   </div>
 </header>
 
@@ -197,14 +229,14 @@
 <section id="dashboard">
   <div class="container">
     <h2>The big picture</h2>
-    <p class="sub">Four numbers that frame the whole conversation.</p>
+    <p class="sub">Four numbers, two labs. The picture both paint together.</p>
     <div class="stat-row">
-      <div class="stat n1"><div class="num">~49%</div><div class="label">of U.S. jobs</div><div class="body">have ≥25% of their tasks already performed using Claude.</div><div class="src">Learning Curves, Mar 2026</div></div>
-      <div class="stat n2"><div class="num">+1.8%</div><div class="label">implied annual U.S. productivity boost</div><div class="body">if current AI is universally adopted in 10 yrs — ~2× recent rate.</div><div class="src">Productivity Gains, Nov 2025</div></div>
-      <div class="stat n3"><div class="num">5.1 / 7</div><div class="label">user productivity rating</div><div class="body">avg self-report — "substantially more productive".</div><div class="src">81k-user survey, Dec 2025</div></div>
-      <div class="stat n4"><div class="num">1 in 5</div><div class="label">workers worry about displacement</div><div class="body">top exposure quartile mentions it 3× as often as the bottom.</div><div class="src">81k-user survey, Dec 2025</div></div>
+      <div class="stat n1"><div class="num">~49%</div><div class="label">of U.S. jobs</div><div class="body">have ≥25% of tasks done using Claude. <strong style="color:var(--microsoft)">Microsoft echo:</strong> 49% of M365 Copilot chats are cognitive work.</div><div class="src">Anthropic + Microsoft · 2026</div></div>
+      <div class="stat n2"><div class="num" style="color:var(--microsoft)">15×</div><div class="label">YoY growth in M365 agents</div><div class="body">18× in large enterprises. Agents are being deployed at enterprise scale right now — not "maybe later".</div><div class="src">Microsoft WTI, May 2026</div></div>
+      <div class="stat n3"><div class="num" style="color:var(--diff)">67% / 32%</div><div class="label">org vs individual factors</div><div class="body">Culture, managers and talent practices drive 2× the AI impact of individual mindset. The system, not the skill, is what to fix.</div><div class="src">Microsoft WTI · 20k workers</div></div>
+      <div class="stat n4"><div class="num">1 in 5</div><div class="label">workers in 'Frontier' zone</div><div class="body">Anthropic: 1 in 5 workers worry about displacement. Microsoft: 19% are in the Frontier (high individual + high org). The rest are misaligned.</div><div class="src">Both labs</div></div>
     </div>
-    <div class="caveat">Caveat — the +1.8% figure is Anthropic's own estimate from in-conversation time savings. Past randomized trials found smaller gains (–19% to +56%). See the Surplus section for the full comparison.</div>
+    <div class="caveat">Caveat — Anthropic's +1.8% productivity headline (v3.1) is in-chat estimated. Microsoft's 67/32 split is correlational, not causal. Both deserve triangulation against your own internal data.</div>
   </div>
 </section>
 
@@ -279,22 +311,46 @@
   </div>
 </section>
 
-<!-- AUGMENTATION VS AUTOMATION -->
-<section id="assist-vs-automate">
+<!-- TRANSFORMATION PARADOX (Microsoft) -->
+<section id="paradox">
   <div class="container">
-    <h2>Augmentation vs automation over time</h2>
-    <p class="sub">The single most important trend for "assist vs automate" decisions.</p>
+    <h2>The Transformation Paradox <span class="provider-badge microsoft">Microsoft</span></h2>
+    <p class="sub">Workers are ready. Their organizations aren't. The system is the bottleneck.</p>
     <div class="chart-section">
       <div class="chart-card">
-        <div class="chart-title" style="color:var(--diff)">SHARE OF CLAUDE.AI CONVERSATIONS (%)</div>
-        <canvas id="chart-augaut"></canvas>
+        <div class="chart-title" style="color:var(--microsoft)">AI USERS BY READINESS ZONE (I = INDIVIDUAL · O = ORGANIZATIONAL)</div>
+        <canvas id="chart-paradox"></canvas>
       </div>
       <div class="commentary">
-        <h4 style="color:var(--diff)">Watch the crossover</h4>
-        <p>August 2025: automation <strong>briefly took the lead</strong> (56% vs 42%) — then augmentation rebounded.</p>
-        <p>On the API surface (not shown), automation is dominant and growing — <strong>business sales and trading both doubled</strong> in 3 months.</p>
-        <p><strong>Implication:</strong> the "assist vs automate" question is being answered differently on each surface. Pick the right one per workflow, or watch your AI investment leak.</p>
-        <p style="font-size:12px;color:var(--text-low);font-style:italic;margin-top:18px">Sources: Economic Primitives (Jan 2026, Fig 1.3) + Learning Curves (Mar 2026). Feb 2026 value approximated.</p>
+        <h4 style="color:var(--microsoft)">The paradox</h4>
+        <p>Only <strong>19%</strong> of AI users are in the Frontier — high individual + high org readiness.</p>
+        <p><strong>10%</strong> have built strong individual skills but their org can't keep up (<strong style="color:var(--text-hi)">Blocked Agency</strong>).</p>
+        <p><strong>65%</strong> fear falling behind if they don't adapt quickly. But <strong>45%</strong> say it feels safer to focus on current goals than redesign work.</p>
+        <p>Only <strong style="color:var(--decide)">13%</strong> say they're rewarded for reinventing work even if results aren't met.</p>
+        <div class="mgr-callout">
+          <div class="label">Manager impact</div>
+          <p>When managers model AI use → <strong>+17 pts</strong> AI value, <strong>+22 pts</strong> critical thinking, <strong>+30 pts</strong> trust in agentic AI.</p>
+        </div>
+        <p style="font-size:12px;color:var(--text-low);font-style:italic;margin-top:12px">Source: Microsoft Work Trend Index 2026, May 5 2026. 20,000 workers + 1,800-worker manager study.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AUGMENTATION VS AUTOMATION + MICROSOFT AGENT GROWTH -->
+<section id="assist-vs-automate">
+  <div class="container">
+    <h2>Augmentation vs automation, and agents on the rise</h2>
+    <p class="sub">Two views of the assist-vs-automate trend. Both labs agree: agents are scaling fast.</p>
+    <div class="chart-section">
+      <div class="chart-card">
+        <div class="chart-title" style="color:var(--diff)">CLAUDE.AI CONVERSATIONS — AUGMENTATION VS AUTOMATION <span class="provider-badge anthropic">Anthropic</span></div>
+        <canvas id="chart-augaut"></canvas>
+      </div>
+      <div class="chart-card small">
+        <div class="chart-title" style="color:var(--microsoft)">MICROSOFT 365 ACTIVE AGENTS — YoY GROWTH <span class="provider-badge microsoft">Microsoft</span></div>
+        <canvas id="chart-agents"></canvas>
+        <p style="color:var(--text-mid);font-size:13px;margin-top:14px"><strong style="color:var(--text-hi)">Both labs agree:</strong> agent deployment is happening faster than most C-suites realize. Anthropic shows the consumer/automation crossover (August 2025: automation briefly took the lead at 56% vs 42%); Microsoft shows the enterprise-scale explosion. The "pick assist or automate" decision per workflow is now urgent.</p>
       </div>
     </div>
   </div>
@@ -341,6 +397,13 @@
       <button class="chip" data-bucket="emerging">Still emerging</button>
       <button class="reset" id="reset-btn">Reset</button>
     </div>
+    <div class="filters" id="provider-filters">
+      <span class="filter-label">Provider</span>
+      <button class="chip active" data-provider="all">All</button>
+      <button class="chip" data-provider="Anthropic">Anthropic only</button>
+      <button class="chip" data-provider="Microsoft">Microsoft only</button>
+      <button class="chip" data-provider="Both">Cross-lab agreement</button>
+    </div>
     <div class="filters" id="decision-filters">
       <span class="filter-label">Tied to decision</span>
       <button class="chip active" data-decision="all">All</button>
@@ -349,6 +412,8 @@
       <button class="chip" data-decision="03">D03 · Assist vs automate</button>
       <button class="chip" data-decision="04">D04 · Internal measurement</button>
       <button class="chip" data-decision="05">D05 · Agent governance</button>
+      <button class="chip" data-decision="06">D06 · Manager capability</button>
+      <button class="chip" data-decision="07">D07 · Learning System</button>
     </div>
     <div class="grid" id="findings-grid"></div>
   </div>
@@ -395,7 +460,7 @@
 
 <footer>
   <div class="container">
-    <p>AI Impact Briefing · v3.1 · May 2026 · Built on six Anthropic Economic Research reports · Findings now linked to the five C-suite decisions</p>
+    <p>AI Impact Briefing · v4 · May 2026 · Built on six Anthropic Economic Research reports + Microsoft Work Trend Index 2026 · Findings linked to seven C-suite decisions</p>
   </div>
 </footer>
 
@@ -403,7 +468,7 @@
 // ===================================================================
 // COLOR + CHART DEFAULTS
 // ===================================================================
-const COLORS = { bg:'#0A0E27', bgAlt:'#121732', textHi:'#F5F5F7', textMid:'#B8BCC8', textLow:'#6B7080', accent:'#FF6B35', same:'#9B8CFF', diff:'#4ECDC4', emerg:'#FFD23F', decide:'#E63946', divider:'#2A2F4F' };
+const COLORS = { bg:'#0A0E27', bgAlt:'#121732', textHi:'#F5F5F7', textMid:'#B8BCC8', textLow:'#6B7080', accent:'#FF6B35', same:'#9B8CFF', diff:'#4ECDC4', emerg:'#FFD23F', decide:'#E63946', divider:'#2A2F4F', anthropic:'#FF6B35', microsoft:'#00BCF2' };
 Chart.defaults.color = COLORS.textMid;
 Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
 const commonGrid = { color: 'rgba(42,47,79,0.6)' };
@@ -413,29 +478,36 @@ const tooltip = { backgroundColor: COLORS.bgAlt, borderColor: COLORS.divider, bo
 // DATA
 // ===================================================================
 const FINDINGS = [
-  { bucket:'same', title:'Productivity paradox / J-curve', body:"Investment precedes measurable output. Electricity (1880s–1920s) and IT (1970s–90s) showed long lags. Anthropic's 1.8% productivity claim is itself an upper bound that ignores adoption delay.", src:'Historical + Productivity Gains, Nov 2025', decisions:["04"] },
-  { bucket:'same', title:'Anxiety tracks exposure, not reality (yet)', body:"Workers in highly-exposed roles worry most. Same pattern as ATMs, robotics, offshoring. Labor Market Impacts (Mar 2026) finds NO systematic rise in unemployment for exposed workers since late 2022.", src:'Labor Market Impacts, Mar 2026', decisions:[] },
-  { bucket:'same', title:'Higher-skill workers benefit first', body:"Software engineers and managers report the largest gains. Skill-biased technical change — high-tenure users get 3-5pp better outcomes, controlling for task selection.", src:'Learning Curves, Mar 2026', decisions:[] },
-  { bucket:'same', title:'Geographic & demographic gaps that narrow', body:"Top-5 US states fell from 30% → 24% share of usage in 6 months. Convergence happens, just slower than the news cycle suggests.", src:'Learning Curves, Mar 2026', decisions:[] },
-  { bucket:'same', title:'Diffusion is slower than headline capability', body:"Claude covers just 33% of theoretically feasible Computer & Math tasks. The capability ceiling is much higher than current usage — adoption, not capability, is the bottleneck.", src:'Labor Market Impacts, Mar 2026', decisions:["03"] },
+  // SAME
+  { bucket:'same', provider:'Anthropic', title:'Productivity paradox / J-curve', body:"Investment precedes measurable output. Electricity (1880s–1920s) and IT (1970s–90s) showed long lags. Anthropic's 1.8% productivity claim is itself an upper bound that ignores adoption delay.", src:'Historical + Productivity Gains, Nov 2025', decisions:["04"] },
+  { bucket:'same', provider:'Both', title:'Anxiety tracks exposure, not reality (yet)', body:"Workers in highly-exposed roles worry most. Both labs confirm: anxiety is widespread (Anthropic: 1 in 5 worry; Microsoft: 65% fear falling behind) — but layoffs aren't following yet.", src:'Anthropic + Microsoft 2026', decisions:[] },
+  { bucket:'same', provider:'Both', title:'Higher-skill workers benefit first', body:"Software engineers and managers report the largest gains. Microsoft's Frontier Professionals (16%) mirror Anthropic's high-tenure outperformance.", src:'Learning Curves + Microsoft WTI', decisions:[] },
+  { bucket:'same', provider:'Anthropic', title:'Geographic & demographic gaps that narrow', body:"Top-5 US states fell from 30% → 24% share of usage in 6 months. Convergence happens, just slower than the news cycle suggests.", src:'Learning Curves, Mar 2026', decisions:[] },
+  { bucket:'same', provider:'Microsoft', title:'The system, not the tool, gates value', body:"Microsoft: org factors = 2× individual factors. Past tech waves taught the same lesson; we're re-learning it for AI.", src:'Microsoft WTI 2026', decisions:["06"] },
+  { bucket:'same', provider:'Anthropic', title:'Diffusion is slower than headline capability', body:"Claude covers just 33% of theoretically feasible Computer & Math tasks. The capability ceiling is much higher than current usage — adoption, not capability, is the bottleneck.", src:'Labor Market Impacts, Mar 2026', decisions:["03"] },
 
-  { bucket:'different', title:'Speed of adoption', body:"~49% of jobs already have ≥25% of tasks touched by Claude in <3 years. Electricity took a generation.", src:'Learning Curves, Mar 2026', decisions:["03","05"] },
-  { bucket:'different', title:'Cognitive, not physical', body:"Past waves automated routine and physical work. This wave automates judgment, writing, and analysis.", src:'All Anthropic reports', decisions:["01"] },
-  { bucket:'different', title:'White collar exposed first', body:"Top exposed: Computer Programmers (75% coverage), Customer Service Reps, Data Entry Keyers (67%). Historic blue-collar-first pattern inverted.", src:'Labor Market Impacts, Mar 2026', decisions:["01"] },
-  { bucket:'different', title:'Entry-level disproportionately exposed', body:"Young workers (22-25) into exposed roles: ~14% drop in job-finding rate vs 2022. Just barely significant — but the apprenticeship pipeline is now a strategic risk.", src:'Labor Market Impacts (Mar 2026) + 81k survey', decisions:["01"] },
-  { bucket:'different', title:'Scope > Speed', body:"48% of users describe doing NEW tasks they couldn't before (vs 40% who do existing tasks faster). Net-new capability is the dominant story.", src:'81k-user survey, Dec 2025', decisions:[] },
-  { bucket:'different', title:'Dual-channel deployment', body:"Consumer 'assist' AND API 'automate' growing simultaneously. API computer-and-math +14%; Claude.ai same category –18% over six months.", src:'Learning Curves, Mar 2026', decisions:["03"] },
-  { bucket:'different', title:'Barbell of gains', body:"Highest-paid AND some lowest-paid report the largest gains — delivery drivers building e-commerce, landscapers building apps. Pure skill-bias doesn't fit.", src:'81k-user survey (Fig 3)', decisions:[] },
-  { bucket:'different', title:'Learning curves matter', body:"High-tenure Claude users have 3-5pp higher success rate, controlling for task. Skill in *using* AI is itself a new form of skill-biased technical change.", src:'Learning Curves, Mar 2026', decisions:["04"] },
+  // DIFFERENT
+  { bucket:'different', provider:'Both', title:'Speed of adoption', body:"~49% of jobs touched in <3 yrs (Anthropic). Microsoft: 15× YoY agent growth, 18× in large enterprises. Electricity took a generation.", src:'Anthropic + Microsoft 2026', decisions:["03","05"] },
+  { bucket:'different', provider:'Both', title:'Cognitive, not physical', body:"Past waves automated routine work. Anthropic: cognitive occupations top exposure list. Microsoft: 49% of Copilot chats support cognitive work directly.", src:'Both labs', decisions:["01"] },
+  { bucket:'different', provider:'Anthropic', title:'White collar exposed first', body:"Top exposed: Computer Programmers (75% coverage), Customer Service Reps, Data Entry Keyers (67%). Historic blue-collar-first pattern inverted.", src:'Labor Market Impacts, Mar 2026', decisions:["01"] },
+  { bucket:'different', provider:'Anthropic', title:'Entry-level disproportionately exposed', body:"Young workers (22-25) into exposed roles: ~14% drop in job-finding rate vs 2022. The apprenticeship pipeline is a strategic risk.", src:'Labor Market Impacts + 81k survey', decisions:["01"] },
+  { bucket:'different', provider:'Both', title:'Scope > Speed', body:"Anthropic: 48% report doing NEW tasks they couldn't before. Microsoft: 58% producing work they couldn't a year ago (80% for Frontier Professionals). Net-new capability is the dominant story.", src:'Anthropic + Microsoft', decisions:[] },
+  { bucket:'different', provider:'Anthropic', title:'Dual-channel deployment', body:"Consumer 'assist' AND API 'automate' growing simultaneously. API computer-and-math +14%; Claude.ai same category –18% over six months.", src:'Learning Curves, Mar 2026', decisions:["03"] },
+  { bucket:'different', provider:'Anthropic', title:'Barbell of gains', body:"Highest-paid AND some lowest-paid report the largest gains — delivery drivers building e-commerce, landscapers building apps. Pure skill-bias doesn't fit.", src:'81k-user survey (Fig 3)', decisions:[] },
+  { bucket:'different', provider:'Anthropic', title:'Learning curves matter', body:"High-tenure Claude users have 3-5pp higher success rate, controlling for task. Skill in *using* AI is itself a new form of skill-biased technical change.", src:'Learning Curves, Mar 2026', decisions:["04"] },
+  { bucket:'different', provider:'Microsoft', title:'Org factors dominate individual ones', body:"Microsoft: organizational factors account for 2× the AI impact of individual mindset. The system, not the skill, is what to fix.", src:'Microsoft WTI 2026', decisions:["04","06"] },
 
-  { bucket:'emerging', title:'Where the surplus settles', body:"Most users say AI gains accrue to them; 10% already say employers/clients capture it. The wage-vs-profit split is being decided in this window.", src:'81k-user survey (Fig 4)', decisions:["02"] },
-  { bucket:'emerging', title:'The U-curve paradox', body:"Workers experiencing the LARGEST speedups are MORE worried about displacement, not less. Fast wins ≠ job security; the human reaction is non-linear.", src:'81k-user survey (Fig 6) — verified against PDF', decisions:["01","04"] },
-  { bucket:'emerging', title:'Real productivity vs estimated', body:"Anthropic's in-chat estimate: 80% time savings. Past RCTs: –19% to +56%. The gap is the unmeasured cost of validating and refining AI output.", src:'Productivity Gains, Nov 2025', decisions:["04"] },
-  { bucket:'emerging', title:'Hiring of early-career workers', body:"Tentative slowdown — ~14% drop in job-finding rate. Not yet definitive but consistent across reports.", src:'Labor Market Impacts, Mar 2026', decisions:["01"] },
-  { bucket:'emerging', title:'Net job creation vs destruction', body:"Solopreneurs use AI to launch businesses. Whether AI creates new task categories at scale, or mainly compresses existing ones, is unsettled.", src:'81k-user survey · qualitative', decisions:[] },
-  { bucket:'emerging', title:'Quality & trust ceiling', body:"Lawyers and scientists report the lowest gains — AI 'diverges every time' on precise instructions. High-stakes sectors hit a quality wall first.", src:'81k-user survey (Fig 3, right panel)', decisions:["05"] },
-  { bucket:'emerging', title:'Worker consent & sentiment', body:"Some respondents say AI is 'imposed on them by their employers' and feels stifling. Mandates without choice damage culture and retention.", src:'81k-user survey · qualitative', decisions:["02","04"] },
-  { bucket:'emerging', title:'Bottleneck tasks', body:"As AI accelerates some tasks, others become bottlenecks. A home inspector's report-writing speeds up; the site visit doesn't. Watch what becomes the new constraint.", src:'Productivity Gains, Nov 2025', decisions:["03"] },
+  // EMERGING
+  { bucket:'emerging', provider:'Anthropic', title:'Where the surplus settles', body:"Most users say AI gains accrue to them; 10% already say employers/clients capture it. The wage-vs-profit split is being decided in this window.", src:'81k-user survey (Fig 4)', decisions:["02"] },
+  { bucket:'emerging', provider:'Anthropic', title:'The U-curve paradox', body:"Workers experiencing the LARGEST speedups are MORE worried about displacement, not less. Fast wins ≠ job security; the human reaction is non-linear.", src:'81k-user survey (Fig 6) — verified against PDF', decisions:["01","04"] },
+  { bucket:'emerging', provider:'Anthropic', title:'Real productivity vs estimated', body:"Anthropic's in-chat estimate: 80% time savings. Past RCTs: –19% to +56%. The gap is the unmeasured cost of validating and refining AI output.", src:'Productivity Gains, Nov 2025', decisions:["04"] },
+  { bucket:'emerging', provider:'Anthropic', title:'Hiring of early-career workers', body:"Tentative slowdown — ~14% drop in job-finding rate. Not yet definitive but consistent across reports.", src:'Labor Market Impacts, Mar 2026', decisions:["01"] },
+  { bucket:'emerging', provider:'Microsoft', title:'The Transformation Paradox', body:"Microsoft: 65% fear falling behind, 45% feel safer with current goals, only 13% rewarded for AI-driven reinvention. The same forces accelerating AI adoption are restraining it.", src:'Microsoft WTI 2026', decisions:["06"] },
+  { bucket:'emerging', provider:'Microsoft', title:'Owned Intelligence', body:"Microsoft: can your org capture insight from agent work, encode it, share it — and compound it? Most can't yet. This is the new moat: institutional know-how that's unique and hard to replicate.", src:'Microsoft WTI 2026', decisions:["07"] },
+  { bucket:'emerging', provider:'Anthropic', title:'Net job creation vs destruction', body:"Solopreneurs use AI to launch businesses. Whether AI creates new task categories at scale, or mainly compresses existing ones, is unsettled.", src:'81k-user survey · qualitative', decisions:[] },
+  { bucket:'emerging', provider:'Anthropic', title:'Quality & trust ceiling', body:"Lawyers and scientists report the lowest gains — AI 'diverges every time' on precise instructions. High-stakes sectors hit a quality wall first.", src:'81k-user survey (Fig 3, right panel)', decisions:["05"] },
+  { bucket:'emerging', provider:'Anthropic', title:'Worker consent & sentiment', body:"Some respondents say AI is 'imposed on them by their employers' and feels stifling. Mandates without choice damage culture and retention.", src:'81k-user survey · qualitative', decisions:["02","04"] },
+  { bucket:'emerging', provider:'Anthropic', title:'Bottleneck tasks', body:"As AI accelerates some tasks, others become bottlenecks. A home inspector's report-writing speeds up; the site visit doesn't. Watch what becomes the new constraint.", src:'Productivity Gains, Nov 2025', decisions:["03"] },
 ];
 
 const DECISIONS = [
@@ -443,19 +515,22 @@ const DECISIONS = [
   { n:'02', h:'Set the surplus-sharing rule', b:'Workers feel gains today; 10% already say employers capture them. The wage-vs-profit split is being set NOW.' },
   { n:'03', h:"Choose 'assist' or 'automate' per workflow", b:'Coding migrating Claude.ai → API (–18% / +14%). Picking the wrong mode per workflow is the most expensive AI decision.' },
   { n:'04', h:'Stand up internal measurement', b:'Macro data lags by quarters. Track output, time-to-task, skill mix, error rates yourself.' },
-  { n:'05', h:'Govern the shift to agents', b:'API automation in sales/trading doubling every 3 months. Decide who approves an AI agent going live, what triggers rollback.' },
+  { n:'05', h:'Govern the shift to agents', b:'Microsoft: 15× YoY agent growth. Decide who approves an AI agent going live, what triggers rollback.' },
+  { n:'06', h:'Equip managers to lead AI rollouts', b:'NEW (Microsoft): when managers model AI use → +17 pts AI value, +22 pts critical thinking, +30 pts trust in agentic AI. Manager capability is its own lever.' },
+  { n:'07', h:'Build a Learning System', b:'NEW (Microsoft): capture insight from agent work, encode it into shared routines, compound it into "Owned Intelligence" that\'s unique to your firm and hard to replicate.' },
 ];
 
-const SOURCES_BY_EPOCH = {
-  post: { label:'Post-primitives epoch · Jan 2026 onward', sub:'New economic primitives framework; finer measurement', items: [
-    { label:'Source 01', title:"'What 81,000 people told us about the economics of AI'", desc:'Companion report; 81,000 open-ended responses from Claude users (Dec 2025). Verified against full PDF.', date:'Apr 22, 2026', url:'https://www.anthropic.com/research/81k-economics' },
+const SOURCES_BY_PROVIDER = {
+  anthropic: { label:'Anthropic · Economic Research', sub:'Monthly Economic Index + companion studies. Data from Claude.ai + API.', items: [
+    { label:'Source 01', title:"'What 81,000 people told us about the economics of AI'", desc:'81,000 open-ended responses from Claude users (Dec 2025). Verified against full PDF.', date:'Apr 22, 2026', url:'https://www.anthropic.com/research/81k-economics' },
     { label:'Source 02', title:'Announcing the Anthropic Economic Index Survey', desc:'Launches a monthly survey via Anthropic Interviewer — recurring qualitative signal.', date:'Apr 22, 2026', url:'https://www.anthropic.com/research/economic-index-survey-announcement' },
     { label:'Source 03', title:"Anthropic Economic Index: 'Learning Curves'", desc:"5th Economic Index. Feb 2026 data. Usage diversification, model selection by task wage, API ⇄ Claude.ai divergence.", date:'Mar 24, 2026', url:'https://www.anthropic.com/research/economic-index-march-2026-report' },
     { label:'Source 04', title:'Labor market impacts of AI: A new measure and early evidence', desc:"Introduces 'observed exposure'. No systematic unemployment rise yet, but ~14% drop in young-worker hiring.", date:'Mar 5, 2026', url:'https://www.anthropic.com/research/labor-market-impacts' },
-    { label:'Source 05', title:'Anthropic Economic Index report: Economic Primitives', desc:'Introduces the five-primitives framework. Epoch boundary for trend comparison.', date:'Jan 15, 2026', url:'https://www.anthropic.com/research/anthropic-economic-index-january-2026-report' },
+    { label:'Source 05', title:'Anthropic Economic Index: Economic Primitives', desc:'Introduces the five-primitives framework. The epoch boundary for trend comparison.', date:'Jan 15, 2026', url:'https://www.anthropic.com/research/anthropic-economic-index-january-2026-report' },
+    { label:'Source 06', title:'Estimating AI productivity gains from Claude conversations', desc:'Methodology paper behind the +1.8% productivity-boost headline. Compares to past RCTs, explains bottleneck tasks. (Pre-primitives epoch.)', date:'Nov 25, 2025', url:'https://www.anthropic.com/research/estimating-productivity-gains' },
   ]},
-  pre: { label:'Pre-primitives epoch · before Jan 2026', sub:'Older measurement framework; baseline data', items: [
-    { label:'Source 06', title:'Estimating AI productivity gains from Claude conversations', desc:'Methodology behind the +1.8% productivity-boost headline. Compares to past RCTs and explains bottleneck tasks.', date:'Nov 25, 2025', url:'https://www.anthropic.com/research/estimating-productivity-gains' },
+  microsoft: { label:'Microsoft · Work Trend Index', sub:'Annual report. Data from M365 Copilot + 20,000-worker survey across 10 countries.', items: [
+    { label:'Source 07', title:'Work Trend Index 2026: Agents, human agency, and the opportunity for every organization', desc:'Annual flagship. M365 productivity signals + 20k workers across 10 countries + 1,800-worker manager study. Introduces Transformation Paradox, 5 readiness zones, 15× agent growth, Frontier Firms / Owned Intelligence concepts.', date:'May 5, 2026', url:'https://www.microsoft.com/en-us/worklab/work-trend-index/agents-human-agency-and-the-opportunity-for-every-organization' },
   ]}
 };
 
@@ -539,6 +614,42 @@ function makeAugAutChart() {
   });
 }
 
+// 5a. Transformation Paradox (Microsoft 5 readiness zones)
+function makeParadoxChart() {
+  const el = document.getElementById('chart-paradox');
+  if (!el) return;
+  new Chart(el, {
+    type: 'bar',
+    data: {
+      labels: ['Stalled (low/low)','Blocked Agency (high I, low O)','Unclaimed Capacity (low I, high O)','Emergent (middle)','Frontier (high/high)'],
+      datasets: [{ label:'Share of AI users (%)', data:[16,10,5,50,19], backgroundColor: [COLORS.decide, COLORS.emerg, COLORS.emerg, COLORS.textLow, COLORS.diff], borderRadius:4 }]
+    },
+    options: {
+      indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ ...tooltip, callbacks:{ label: c => c.parsed.x + '%' } } },
+      scales:{ x:{ beginAtZero:true, max:60, grid: commonGrid, ticks:{ callback:v=>v+'%' } }, y:{ grid:{display:false} } }
+    }
+  });
+}
+
+// 5b. Microsoft agent growth
+function makeAgentsChart() {
+  const el = document.getElementById('chart-agents');
+  if (!el) return;
+  new Chart(el, {
+    type: 'bar',
+    data: {
+      labels: ['All firms','Large enterprises'],
+      datasets: [{ label:'YoY multiplier', data:[15,18], backgroundColor: COLORS.microsoft, borderRadius:6 }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ ...tooltip, callbacks:{ label: c => c.parsed.y + '×' } } },
+      scales:{ x:{ grid:{display:false}, ticks:{color: COLORS.textMid, font:{size:13}} }, y:{ beginAtZero:true, max:22, grid: commonGrid, ticks:{ callback:v=>v+'×' } } }
+    }
+  });
+}
+
 // 5. U-curve
 function makeUCurve() {
   new Chart(document.getElementById('chart-ucurve'), {
@@ -560,12 +671,12 @@ function makeUCurve() {
 
 // 6. Sparklines for trend strip
 const SPARKS = [
-  { label:'Job coverage breadth', desc:'% jobs ≥25% covered', values:[25,35,49,49], color: COLORS.diff, arrow:'↗', direction:'RISING', dirClass:'up-color', narrative:'Stable in Feb after rapid expansion.' },
-  { label:'Top-5 US states share', desc:'Geographic spread', values:[30,28,26,24], color: COLORS.diff, arrow:'↘', direction:'CONVERGING', dirClass:'up-color', narrative:'US within-country: gap closing.' },
-  { label:'Top-20 countries share', desc:'Global concentration', values:[45,46,47,48], color: COLORS.emerg, arrow:'↗', direction:'DIVERGING', dirClass:'emerg-color', narrative:'Globally: gap widening.' },
-  { label:'Avg task wage (Claude.ai)', desc:'USD per task', values:[49.3,49.0,48.4,47.9], color: COLORS.diff, arrow:'↘', direction:'BROADENING', dirClass:'up-color', narrative:'Adoption spreading to lower-wage tasks.' },
-  { label:'Young-worker hiring', desc:'Exposed roles, % of 2022', values:[100,95,90,86], color: COLORS.decide, arrow:'↘', direction:'EARLY SIGNAL', dirClass:'down-color', narrative:'~14% drop, just barely significant.' },
-  { label:'Augmentation share', desc:'Claude.ai conversations %', values:[56,42,55,53], color: COLORS.emerg, arrow:'⇄', direction:'OSCILLATING', dirClass:'emerg-color', narrative:'Briefly flipped to automation in Aug 2025.' },
+  { label:'Job coverage breadth · Anthropic', desc:'% jobs ≥25% covered', values:[25,35,49,49], color: COLORS.diff, arrow:'↗', direction:'RISING', dirClass:'up-color', narrative:'Stable in Feb after rapid expansion.' },
+  { label:'M365 active agents · Microsoft', desc:'YoY multiplier', values:[1,3,8,15], color: COLORS.microsoft, arrow:'↗', direction:'EXPLODING', dirClass:'up-color', narrative:'15× YoY (18× in large enterprises).' },
+  { label:'Top-5 US states share · Anthropic', desc:'Geographic spread', values:[30,28,26,24], color: COLORS.diff, arrow:'↘', direction:'CONVERGING', dirClass:'up-color', narrative:'US within-country: gap closing.' },
+  { label:'Avg task wage (Claude.ai) · Anthropic', desc:'USD per task', values:[49.3,49.0,48.4,47.9], color: COLORS.diff, arrow:'↘', direction:'BROADENING', dirClass:'up-color', narrative:'Adoption spreading to lower-wage tasks.' },
+  { label:'Young-worker hiring · Anthropic', desc:'Exposed roles, % of 2022', values:[100,95,90,86], color: COLORS.decide, arrow:'↘', direction:'EARLY SIGNAL', dirClass:'down-color', narrative:'~14% drop, just barely significant.' },
+  { label:'Frontier worker share · Microsoft', desc:'High-readiness zone', values:[19], color: COLORS.microsoft, arrow:'→', direction:'NEW BASELINE', dirClass:'up-color', narrative:'First reading; 81% of workers are misaligned in some way.' },
 ];
 
 function renderTrendStrip() {
@@ -581,7 +692,14 @@ function renderTrendStrip() {
   `).join('');
 
   SPARKS.forEach((sp, i) => {
-    const ctx = document.getElementById('spark-' + i).getContext('2d');
+    const el = document.getElementById('spark-' + i);
+    if(!el) return;
+    if(sp.values.length < 2){
+      // Single-value: show big number instead of sparkline
+      el.parentElement.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:32px;font-weight:900;color:${sp.color};font-family:Arial Black,sans-serif">${sp.values[0]}%</div>`;
+      return;
+    }
+    const ctx = el.getContext('2d');
     new Chart(ctx, {
       type:'line',
       data:{ labels: sp.values.map(()=>''), datasets:[{ data: sp.values, borderColor: sp.color, backgroundColor:'transparent', borderWidth:3, tension:0.4, pointRadius:4, pointBackgroundColor: sp.color }] },
@@ -603,10 +721,13 @@ function renderFindings(){
   document.getElementById('findings-grid').innerHTML = FINDINGS.map(f => {
     const decPills = (f.decisions || []).map(d => `<span class="tag decision" title="Tied to Decision ${d}">D${d}</span>`).join('');
     const dataDec = (f.decisions || []).join(',');
+    const provider = f.provider || 'Anthropic';
+    const providerCls = provider === 'Microsoft' ? 'microsoft' : (provider === 'Both' ? 'both' : 'anthropic');
     return `
-    <div class="card" data-bucket="${f.bucket}" data-decisions="${dataDec}">
+    <div class="card" data-bucket="${f.bucket}" data-decisions="${dataDec}" data-provider="${provider}">
       <div class="tag-row">
         <span class="tag ${f.bucket}">${labelFor(f.bucket)}</span>
+        <span class="tag provider-tag ${providerCls}">${provider}</span>
         ${decPills}
       </div>
       <h3>${f.title}</h3>
@@ -641,8 +762,8 @@ function renderDecisions(){
 function renderSources(){
   const root = document.getElementById('sources-grouped');
   let html = '';
-  for (const key of ['post','pre']) {
-    const group = SOURCES_BY_EPOCH[key];
+  for (const key of ['anthropic','microsoft']) {
+    const group = SOURCES_BY_PROVIDER[key];
     html += `<div class="epoch-block ${key}">
       <div class="epoch-header"><span class="epoch-label">${group.label}</span><span class="epoch-range">${group.sub}</span></div>
       <div class="src-list">${group.items.map(s => `
@@ -657,15 +778,26 @@ function renderSources(){
 }
 
 // FILTERS
-let activeBucket='all', activeDecision='all';
+let activeBucket='all', activeDecision='all', activeProvider='all';
 function applyFilters(){
   document.querySelectorAll('#findings-grid .card').forEach(card => {
     const bucketOk = activeBucket==='all' || card.dataset.bucket===activeBucket;
     const decs = (card.dataset.decisions || '').split(',').filter(Boolean);
     const decOk = activeDecision==='all' || decs.includes(activeDecision);
-    card.classList.toggle('hidden', !(bucketOk && decOk));
+    const provOk = activeProvider==='all' || card.dataset.provider===activeProvider;
+    card.classList.toggle('hidden', !(bucketOk && decOk && provOk));
   });
 }
+document.addEventListener('DOMContentLoaded', () => {
+  const pf = document.getElementById('provider-filters');
+  if(pf) pf.addEventListener('click', e => {
+    if(!e.target.matches('.chip')) return;
+    pf.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    e.target.classList.add('active');
+    activeProvider = e.target.dataset.provider;
+    applyFilters();
+  });
+});
 document.getElementById('bucket-filters').addEventListener('click', e => {
   if(!e.target.matches('.chip')) return;
   document.querySelectorAll('#bucket-filters .chip').forEach(c => c.classList.remove('active'));
@@ -696,6 +828,8 @@ document.addEventListener('DOMContentLoaded', () => {
   makeExposureChart();
   makeProductivityChart();
   makeSurplusChart();
+  makeParadoxChart();
+  makeAgentsChart();
   makeAugAutChart();
   makeUCurve();
 });
